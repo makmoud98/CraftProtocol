@@ -1,3 +1,7 @@
+<p align="center">
+	<img src="https://i.imgur.com/Wv9feiv.png" />
+</p>
+
 # CraftProtocol
 
 Open source partial implementation of Minecraft network protocol (currently only 1.10.x) and NBT in Python 2.7
