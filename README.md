@@ -10,7 +10,7 @@ Also easy-to-use library for creating bots.
 ## How to install?
 
 ```
-pip install CraftProtocol
+pip install --user CraftProtocol
 ```
 
 ## Documentation
