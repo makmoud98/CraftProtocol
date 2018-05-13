@@ -21,5 +21,9 @@ setup(
 	license = "MIT",
 	author_email = "toranktto@gmail.com",
 	url = "https://github.com/Toranktto/CraftProtocol",
-	classifiers = []
+	classifiers = [
+		"Development Status :: 3 - Alpha",
+		"Programming Language :: Python :: 2.7",
+		"License :: OSI Approved :: MIT License"
+	]
 )
