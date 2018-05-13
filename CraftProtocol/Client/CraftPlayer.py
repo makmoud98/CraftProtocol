@@ -162,7 +162,7 @@ class CraftPlayer(object):
 				return
 
 			if packet.get_teleport_id() == 1 and (self.last_teleport_id == None or self.last_teleport_id >= 1):
-				server_teleport_event = Event.ServerTeleportEvent(packet.get_x(), packet.get_y(), packet.get_z(), packet.get_teleport_id())
+				server_teleport_event = Event.ServerTeleportEvent()
 				self.event_bus.fire(server_teleport_event)
 
 				if server_teleport_event.is_cancelled():
@@ -170,7 +170,6 @@ class CraftPlayer(object):
 					return
 
 			self.send_packet(Play.TeleportConfirmPacket(packet.get_teleport_id()))
-
 			if not self.spawned:
 				self.send_packet(Play.PlayerPositionServerPacket(packet.get_x(), packet.get_y(), packet.get_z(), True))
 				self.spawned = True
