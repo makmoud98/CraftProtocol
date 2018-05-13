@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class DisconnectEvent(BaseEvent):
 
-	def __init__(self, reason):
-		BaseEvent.__init__(self)
+	def __init__(self, player, reason):
+		BaseEvent.__init__(self, player)
 		self.reason = reason
 
 	def get_reason(self):

@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class PacketInEvent(BaseEvent):
 
-	def __init__(self, packet):
-		BaseEvent.__init__(self)
+	def __init__(self, player, packet):
+		BaseEvent.__init__(self, player)
 		self.packet = packet
 
 	def get_packet(self):

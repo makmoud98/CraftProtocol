@@ -21,9 +21,9 @@ import types
 
 class CraftPlayerReaderThread(threading.Thread):
 
-	def __init__(self, craftplayer):
+	def __init__(self, player):
 		threading.Thread.__init__(self)
-		self.craftplayer = craftplayer
+		self.player = player
 		self.stopped = False
 
 	def stop(self):
@@ -32,22 +32,22 @@ class CraftPlayerReaderThread(threading.Thread):
 	def run(self):
 		while not self.stopped:
 			try:
-				packet = self.craftplayer.serializer.read(self.craftplayer.sock)
-				self.craftplayer.event_bus.fire(Event.PacketInEvent(packet))
+				packet = self.player.serializer.read(self.player.sock)
+				self.player.event_bus.fire(Event.PacketInEvent(self.player, packet))
 			except socket.timeout:
-				self.craftplayer.disconnect("Timed out")
+				self.player.disconnect("Timed out")
 			except socket.error as ex:
 				if ex.errno == errno.EINTR:
 					continue
 				raise
 			except EOFError:
-				self.craftplayer.disconnect("Connection closed by remote host")
+				self.player.disconnect("Connection closed by remote host")
 
 class CraftPlayerWriterThread(threading.Thread):
 
-	def __init__(self, craftplayer):
+	def __init__(self, player):
 		threading.Thread.__init__(self)
-		self.craftplayer = craftplayer
+		self.player = player
 		self.queue = Queue.Queue()
 		self.stopped = False
 
@@ -67,19 +67,19 @@ class CraftPlayerWriterThread(threading.Thread):
 				time.sleep(0.1)
 				continue
 
-			event = Event.PacketOutEvent(packet)
+			event = Event.PacketOutEvent(self.player, packet)
 
-			self.craftplayer.event_bus.fire(event)
+			self.player.event_bus.fire(event)
 
 			if event.is_cancelled():
 				continue
 
-			self.craftplayer.serializer.write(self.craftplayer.sock, event.get_packet())
+			self.player.serializer.write(self.player.sock, event.get_packet())
 
 class CraftPlayerEventBus(object):
 
-	def __init__(self, craftplayer):
-		self.craftplayer = craftplayer
+	def __init__(self, player):
+		self.player = player
 		self.listeners = {}
 
 	def register_listener(self, event, handler):
@@ -105,7 +105,7 @@ class CraftPlayerEventBus(object):
 				continue
 
 			try:
-				handler.__call__(self.craftplayer, event)
+				handler.__call__(event)
 			except:
 				traceback.print_exc()
 
@@ -137,21 +137,22 @@ class CraftPlayer(object):
 		self.register_listener(Event.PacketOutEvent, self._process_out_packet)
 
 	@Event.Handler(priority = Event.HandlerPriority.LOW, ignore_cancelled = True)
-	def _process_in_packet(self, player, event):
+	def _process_in_packet(self, event):
 		packet = event.get_packet()
+		player = event.get_player()
 
 		if packet.__class__ == Play.DisconnectPacket:
-			player.disconnect(ChatSerializer.strip_colors(json.loads(packet.get_reason())))
+			player.disconnect(player, ChatSerializer.strip_colors(json.loads(packet.get_reason())))
 		elif packet.__class__ == Play.ChatMessageClientPacket:
 			if event.is_cancelled():
 				return
 
-			player.event_bus.fire(Event.ChatReceiveEvent(json.loads(packet.get_chat())))
+			player.event_bus.fire(Event.ChatReceiveEvent(player, json.loads(packet.get_chat())))
 		elif packet.__class__ == Play.PlayerPositionAndLookClientPacket:
 			if event.is_cancelled():
 				return
 
-			teleport_event = Event.TeleportEvent(packet.get_x(), packet.get_y(), packet.get_z(), packet.get_teleport_id())
+			teleport_event = Event.TeleportEvent(player, packet.get_x(), packet.get_y(), packet.get_z(), packet.get_teleport_id())
 			player.event_bus.fire(teleport_event)
 
 			if teleport_event.is_cancelled():
@@ -159,7 +160,7 @@ class CraftPlayer(object):
 				return
 
 			if packet.get_teleport_id() == 1 and player.last_teleport_id >= 1:
-				server_teleport_event = Event.ServerTeleportEvent()
+				server_teleport_event = Event.ServerTeleportEvent(player)
 				player.event_bus.fire(server_teleport_event)
 
 				if server_teleport_event.is_cancelled():
@@ -168,6 +169,13 @@ class CraftPlayer(object):
 
 			player.send_packet(Play.TeleportConfirmPacket(packet.get_teleport_id()))
 			if not player.spawned:
+				spawn_event = Event.SpawnEvent(player)
+				player.event_bus.fire(spawn_event)
+
+				if spawn_event.is_cancelled():
+					event.cancel()
+					return
+
 				player.send_packet(Play.PlayerPositionServerPacket(packet.get_x(), packet.get_y(), packet.get_z(), True))
 				player.spawned = True
 
@@ -180,7 +188,7 @@ class CraftPlayer(object):
 			if event.is_cancelled():
 				return
 
-			login_event = Event.LoginEvent(packet.get_entity_id(), packet.get_gamemode(), packet.get_dimension(), packet.get_difficulty(), packet.get_max_players(), packet.get_level_type(), packet.get_debug_info())
+			login_event = Event.LoginEvent(player, packet.get_entity_id(), packet.get_gamemode(), packet.get_dimension(), packet.get_difficulty(), packet.get_max_players(), packet.get_level_type(), packet.get_debug_info())
 			player.event_bus.fire(login_event)
 
 			if login_event.is_cancelled():
@@ -216,7 +224,7 @@ class CraftPlayer(object):
 
 			inventory = Inventory(packet.get_window_id(), json.loads(packet.get_window_title()), packet.get_window_type(), packet.get_slots_number(), packet.get_entity_id())
 
-			open_inventory_event = Event.OpenInventoryEvent(inventory)
+			open_inventory_event = Event.OpenInventoryEvent(player, inventory)
 			player.event_bus.fire(open_inventory_event)
 
 			if open_inventory_event.is_cancelled():
@@ -230,7 +238,7 @@ class CraftPlayer(object):
 			if event.is_cancelled():
 				return
 
-			update_inventory_event = Event.UpdateInventoryEvent(packet.get_window_id(), packet.get_slots())
+			update_inventory_event = Event.UpdateInventoryEvent(player, packet.get_window_id(), packet.get_slots())
 			player.event_bus.fire(update_inventory_event)
 
 			if update_inventory_event.is_cancelled():
@@ -287,8 +295,9 @@ class CraftPlayer(object):
 			player.lock.release()
 
 	@Event.Handler(priority = Event.HandlerPriority.LOW, ignore_cancelled = True)
-	def _process_out_packet(self, player, event):
+	def _process_out_packet(self, event):
 		packet = event.get_packet()
+		player = event.get_player()
 
 		if packet.__class__ == Play.PlayerPositionServerPacket:
 			if event.is_cancelled():
@@ -309,7 +318,7 @@ class CraftPlayer(object):
 			if event.is_cancelled():
 				return
 
-			chat_send_event = Event.ChatSendEvent(packet.get_text())
+			chat_send_event = Event.ChatSendEvent(player, packet.get_text())
 			player.event_bus.fire(chat_send_event)
 
 			if chat_send_event.is_cancelled():
@@ -329,11 +338,11 @@ class CraftPlayer(object):
 	def is_connected(self):
 		return self.sock != None
 
-	def _disconnect_async(self, reason = ""):
+	def _try_disconnect_async(self, reason = ""):
 		if not self.is_connected():
-			raise IOError("Not connected")
+			return
 
-		self.event_bus.fire(Event.DisconnectEvent(reason))
+		self.event_bus.fire(Event.DisconnectEvent(self, reason))
 
 		self.writer.stop()
 		self.reader.stop()
@@ -350,7 +359,14 @@ class CraftPlayer(object):
 
 	def disconnect(self, reason = ""):
 		with self.lock:
-			self._disconnect_async(reason)
+			if not self.is_connected():
+				raise IOError("Not connected")
+
+			self._try_disconnect_async(reason)
+
+	def try_disconnect(self, reason = ""):
+		with self.lock:
+			self._try_disconnect_async(reason)
 
 	def send_packet(self, packet):
 		with self.lock:
@@ -415,8 +431,7 @@ class CraftPlayer(object):
 
 	def reconnect(self):
 		with self.lock:
-			if self.is_connected():
-				self._disconnect_async("Reconnecting...")
+			self._try_disconnect_async("Reconnecting...")
 
 			new = self.craftserver.login(self.username)
 			new.event_bus = self.event_bus

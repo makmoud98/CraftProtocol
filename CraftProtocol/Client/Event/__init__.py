@@ -12,4 +12,5 @@ from ServerTeleportEvent import ServerTeleportEvent
 from OpenInventoryEvent import OpenInventoryEvent
 from UpdateInventoryEvent import UpdateInventoryEvent
 from LoginEvent import LoginEvent
+from SpawnEvent import SpawnEvent
 from Handler import Handler

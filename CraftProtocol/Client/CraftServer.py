@@ -21,15 +21,11 @@ class CraftServer(object):
 		sock.settimeout(5)
 
 		sock.connect((self.hostname, self.port))
-
 		serializer = PacketSerializer(PacketDirection.SERVERBOUND)
 
-		handshake = Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.STATUS)
-		request = Status.RequestPacket()
-
-		serializer.write(sock, handshake)
+		serializer.write(sock, Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.STATUS))
 		serializer.set_state(ProtocolState.STATUS)
-		serializer.write(sock, request)
+		serializer.write(sock, Status.RequestPacket())
 
 		response = serializer.read(sock)
 		if not isinstance(response, Status.ResponsePacket):
@@ -49,15 +45,11 @@ class CraftServer(object):
 			sock.settimeout(10)
 
 			sock.connect((self.hostname, self.port))
-
 			serializer = PacketSerializer(PacketDirection.SERVERBOUND)
 
-			handshake = Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.LOGIN)
-			login = Login.LoginStartPacket(username)
-
-			serializer.write(sock, handshake)
+			serializer.write(sock, Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.LOGIN))
 			serializer.set_state(ProtocolState.LOGIN)
-			serializer.write(sock, login)
+			serializer.write(sock, Login.LoginStartPacket(username))
 
 			response = serializer.read(sock)
 			while not isinstance(response, Login.LoginSuccessPacket):

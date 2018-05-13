@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class LoginEvent(BaseEvent):
 
-	def __init__(self, entity_id, gamemode, dimension, difficulty, max_players, level_type, debug_info):
-		BaseEvent.__init__(self)
+	def __init__(self, player, entity_id, gamemode, dimension, difficulty, max_players, level_type, debug_info):
+		BaseEvent.__init__(self, player)
 		self.entity_id = entity_id
 		self.gamemode = gamemode
 		self.dimension = dimension

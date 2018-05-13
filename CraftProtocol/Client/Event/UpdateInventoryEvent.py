@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class UpdateInventoryEvent(BaseEvent):
 
-	def __init__(self, id, slots):
-		BaseEvent.__init__(self)
+	def __init__(self, player, id, slots):
+		BaseEvent.__init__(self, player)
 		self.id = id
 		self.slots = slots
 

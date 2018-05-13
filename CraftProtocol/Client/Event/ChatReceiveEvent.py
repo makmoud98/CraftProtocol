@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class ChatReceiveEvent(BaseEvent):
 
-	def __init__(self, text):
-		BaseEvent.__init__(self)
+	def __init__(self, player, text):
+		BaseEvent.__init__(self, player)
 		self.text = text
 
 	def get_text(self):

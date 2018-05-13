@@ -4,8 +4,8 @@ from BaseEvent import BaseEvent
 
 class TeleportEvent(BaseEvent):
 
-	def __init__(self, x, y, z, teleport_id):
-		BaseEvent.__init__(self)
+	def __init__(self, player, x, y, z, teleport_id):
+		BaseEvent.__init__(self, player)
 		self.x = x
 		self.y = y
 		self.z = z
