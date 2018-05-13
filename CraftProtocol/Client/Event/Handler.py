@@ -14,7 +14,7 @@ def Handler(func = None, priority = HandlerPriority.NORMAL, ignore_cancelled = F
 
 		return handler
 
-	if type(func) == types.MethodType or type(func) == types.FunctionType:
+	if callable(func):
 		return _Handler_decorator(func)
 
 	if func != None:

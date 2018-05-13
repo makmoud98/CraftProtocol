@@ -86,9 +86,6 @@ class CraftPlayerEventBus(object):
 		if not hasattr(handler, "_CraftProtocol"):
 			raise ValueError("Handler must be decorated by CraftProtocol.Client.Event.Handler")
 
-		if type(handler) == types.MethodType and handler.__self__:
-			handler = handler.__self__.__class__.__dict__[handler.__name__]
-
 		if event not in self.listeners:
 			self.listeners[event] = []
 
@@ -140,79 +137,79 @@ class CraftPlayer(object):
 		self.register_listener(Event.PacketOutEvent, self._process_out_packet)
 
 	@Event.Handler(priority = Event.HandlerPriority.LOW, ignore_cancelled = True)
-	def _process_in_packet(self, event):
+	def _process_in_packet(self, player, event):
 		packet = event.get_packet()
 
 		if packet.__class__ == Play.DisconnectPacket:
-			self.disconnect(ChatSerializer.strip_colors(json.loads(packet.get_reason())))
+			player.disconnect(ChatSerializer.strip_colors(json.loads(packet.get_reason())))
 		elif packet.__class__ == Play.ChatMessageClientPacket:
 			if event.is_cancelled():
 				return
 
-			self.event_bus.fire(Event.ChatReceiveEvent(json.loads(packet.get_chat())))
+			player.event_bus.fire(Event.ChatReceiveEvent(json.loads(packet.get_chat())))
 		elif packet.__class__ == Play.PlayerPositionAndLookClientPacket:
 			if event.is_cancelled():
 				return
 
 			teleport_event = Event.TeleportEvent(packet.get_x(), packet.get_y(), packet.get_z(), packet.get_teleport_id())
-			self.event_bus.fire(teleport_event)
+			player.event_bus.fire(teleport_event)
 
 			if teleport_event.is_cancelled():
 				event.cancel()
 				return
 
-			if packet.get_teleport_id() == 1 and (self.last_teleport_id == None or self.last_teleport_id >= 1):
+			if packet.get_teleport_id() == 1 and player.last_teleport_id >= 1:
 				server_teleport_event = Event.ServerTeleportEvent()
-				self.event_bus.fire(server_teleport_event)
+				player.event_bus.fire(server_teleport_event)
 
 				if server_teleport_event.is_cancelled():
 					event.cancel()
 					return
 
-			self.send_packet(Play.TeleportConfirmPacket(packet.get_teleport_id()))
-			if not self.spawned:
-				self.send_packet(Play.PlayerPositionServerPacket(packet.get_x(), packet.get_y(), packet.get_z(), True))
-				self.spawned = True
+			player.send_packet(Play.TeleportConfirmPacket(packet.get_teleport_id()))
+			if not player.spawned:
+				player.send_packet(Play.PlayerPositionServerPacket(packet.get_x(), packet.get_y(), packet.get_z(), True))
+				player.spawned = True
 
-			with self.lock:
-				self.x = packet.get_x()
-				self.y = packet.get_y()
-				self.z = packet.get_z()
-				self.last_teleport_id = packet.get_teleport_id()
+			with player.lock:
+				player.x = packet.get_x()
+				player.y = packet.get_y()
+				player.z = packet.get_z()
+				player.last_teleport_id = packet.get_teleport_id()
 		elif packet.__class__ == Play.JoinGamePacket:
 			if event.is_cancelled():
 				return
 
 			login_event = Event.LoginEvent(packet.get_entity_id(), packet.get_gamemode(), packet.get_dimension(), packet.get_difficulty(), packet.get_max_players(), packet.get_level_type(), packet.get_debug_info())
-			self.event_bus.fire(login_event)
+			player.event_bus.fire(login_event)
 
 			if login_event.is_cancelled():
 				event.cancel()
 				return
 
-			self.entity_id = packet.get_entity_id()
+			player.entity_id = packet.get_entity_id()
 
 			brand_buf = StringIO()
 			StreamIO.write_string(brand_buf, "CraftProtocol/" + VersionConstants.VERSION)
 			brand_message = brand_buf.getvalue()
 			brand_buf.close()
 
-			self.respawn()
-			self.send_packet(Play.ClientSettingsPacket("en_US", 0, ChatMode.ENABLED, False, int("11111110", 2), Hand.RIGHT))
-			self.send_packet(Play.PluginMessageServerPacket("MC|Brand", brand_message))
+			player.respawn()
+			player.send_packet(Play.ClientSettingsPacket("en_US", 0, ChatMode.ENABLED, False, int("11111110", 2), Hand.RIGHT))
+			player.send_packet(Play.PluginMessageServerPacket("MC|Brand", brand_message))
 		elif packet.__class__ == Play.ConfirmTransactionClientPacket:
 			if event.is_cancelled():
 				return
 
-			self.lock.acquire()
-			if self.open_inventory == None or packet.get_window_id() != self.open_inventory.get_id():
+			player.lock.acquire()
+			if player.open_inventory == None or packet.get_window_id() != player.open_inventory.get_id():
 				event.cancel()
-				self.lock.release()
-				self.disconnect("Received confirm transaction packet for not initialized window")
+				player.lock.release()
+				player.disconnect("Received confirm transaction packet for not initialized window")
 				return
 
-			self.lock.release()
-			self.send_packet(Play.ConfirmTransactionServerPacket(packet.get_window_id(), packet.get_action_number(), packet.is_accepted()))
+			player.lock.release()
+			player.send_packet(Play.ConfirmTransactionServerPacket(packet.get_window_id(), packet.get_action_number(), packet.is_accepted()))
 		elif packet.__class__ == Play.OpenWindowPacket:
 			if event.is_cancelled():
 				return
@@ -220,100 +217,100 @@ class CraftPlayer(object):
 			inventory = Inventory(packet.get_window_id(), json.loads(packet.get_window_title()), packet.get_window_type(), packet.get_slots_number(), packet.get_entity_id())
 
 			open_inventory_event = Event.OpenInventoryEvent(inventory)
-			self.event_bus.fire(open_inventory_event)
+			player.event_bus.fire(open_inventory_event)
 
 			if open_inventory_event.is_cancelled():
 				event.cancel()
 				return
 
-			self.open_inventory = open_inventory_event.get_inventory()			
+			player.open_inventory = open_inventory_event.get_inventory()			
 		elif packet.__class__ == Play.KeepAliveClientPacket:
-			self.send_packet(Play.KeepAliveServerPacket(packet.get_id()))
+			player.send_packet(Play.KeepAliveServerPacket(packet.get_id()))
 		elif packet.__class__ == Play.WindowItemsPacket:
 			if event.is_cancelled():
 				return
 
 			update_inventory_event = Event.UpdateInventoryEvent(packet.get_window_id(), packet.get_slots())
-			self.event_bus.fire(update_inventory_event)
+			player.event_bus.fire(update_inventory_event)
 
 			if update_inventory_event.is_cancelled():
 				event.cancel()
 				return
 
-			self.lock.acquire()
+			player.lock.acquire()
 
-			if update_inventory_event.get_id() == self.main_inventory.get_id():
+			if update_inventory_event.get_id() == player.main_inventory.get_id():
 				slots = update_inventory_event.get_slots()
 
-				if len(slots) > len(self.main_inventory):
+				if len(slots) > len(player.main_inventory):
 					event.cancel()
-					self.lock.release()
-					self.disconnect("Received too many items")
+					player.lock.release()
+					player.disconnect("Received too many items")
 					return
 
-				main_inventory = self.main_inventory.copy()
+				main_inventory = player.main_inventory.copy()
 
 				for i in range(len(slots)):
 					main_inventory[i] = slots[i]
 
-				self.main_inventory = main_inventory
-				self.lock.release()
+				player.main_inventory = main_inventory
+				player.lock.release()
 				return
 
-			if self.open_inventory == None or packet.get_window_id() != self.open_inventory.get_id():
+			if player.open_inventory == None or packet.get_window_id() != player.open_inventory.get_id():
 				event.cancel()
-				self.lock.release()
-				self.disconnect("Received items for not initialized window")
+				player.lock.release()
+				player.disconnect("Received items for not initialized window")
 				return
 
-			slots = update_inventory_event.get_slots()[:len(self.open_inventory) - 1]
-			main_slots = update_inventory_event.get_slots()[len(self.open_inventory) - 1:]
+			slots = update_inventory_event.get_slots()[:len(player.open_inventory) - 1]
+			main_slots = update_inventory_event.get_slots()[len(player.open_inventory) - 1:]
 
-			if len(main_slots) + 8 > len(self.main_inventory):
+			if len(main_slots) + 8 > len(player.main_inventory):
 				event.cancel()
-				self.lock.release()
-				self.disconnect("Received too many items")
+				player.lock.release()
+				player.disconnect("Received too many items")
 				return
 
-			main_inventory = self.main_inventory.copy()
-			open_inventory = self.open_inventory.copy()
+			main_inventory = player.main_inventory.copy()
+			open_inventory = player.open_inventory.copy()
 
 			for i in range(len(main_slots)):
 				main_inventory[i + 9] = main_slots[i]
 
-			self.main_inventory = main_inventory
+			player.main_inventory = main_inventory
 
 			for i in range(len(slots)):
 				open_inventory[i] = slots[i]
 
-			self.open_inventory = open_inventory
-			self.lock.release()
+			player.open_inventory = open_inventory
+			player.lock.release()
 
 	@Event.Handler(priority = Event.HandlerPriority.LOW, ignore_cancelled = True)
-	def _process_out_packet(self, event):
+	def _process_out_packet(self, player, event):
 		packet = event.get_packet()
 
 		if packet.__class__ == Play.PlayerPositionServerPacket:
 			if event.is_cancelled():
 				return
 
-			with self.lock:
-				self.x = packet.get_x()
-				self.y = packet.get_y()
-				self.z = packet.get_z()
+			with player.lock:
+				player.x = packet.get_x()
+				player.y = packet.get_y()
+				player.z = packet.get_z()
 		elif packet.__class__ == Play.CloseWindowServerPacket:
 			if event.is_cancelled():
 				return
 	
-			with self.lock:
-				if packet.get_window_id() == self.open_inventory.get_id():
-					self.open_inventory = None
+			with player.lock:
+				if packet.get_window_id() == player.open_inventory.get_id():
+					player.open_inventory = None
 		elif packet.__class__ == Play.ChatMessageServerPacket:
 			if event.is_cancelled():
 				return
 
 			chat_send_event = Event.ChatSendEvent(packet.get_text())
-			self.event_bus.fire(chat_send_event)
+			player.event_bus.fire(chat_send_event)
 
 			if chat_send_event.is_cancelled():
 				event.cancel()

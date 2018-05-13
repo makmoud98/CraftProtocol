@@ -16,11 +16,11 @@ class ChatBot(object):
 		self.player.loop()
 
 	@CraftProtocol.Client.Event.Handler
-	def on_chat(self, event):
+	def on_chat(self, player, event):
 		print CraftProtocol.ChatSerializer.strip_colors(event.get_text())
 
 	@CraftProtocol.Client.Event.Handler
-	def on_disconnect(self, event):
+	def on_disconnect(self, player, event):
 		print "Disconnected: " + event.get_reason()
 
 def main():
