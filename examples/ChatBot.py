@@ -28,7 +28,7 @@ def main():
 	server.ping()
 	player = None
 	try:
-		player = server.login("CraftProtocolExample")
+		player = server.login("ChatBot")
 	except CraftProtocol.Client.KickError as ex:
 		print "Kicked: " + ex.get_reason()
 		return
