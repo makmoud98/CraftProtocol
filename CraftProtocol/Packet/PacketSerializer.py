@@ -16,27 +16,27 @@ import types
 class PacketSerializer(object):
 
 	def __init__(self, direction):
-		self.direction = direction
-		self.state = ProtocolState.HANDSHAKING
-		self.threshold = -1
+		self._direction = direction
+		self._state = ProtocolState.HANDSHAKING
+		self._threshold = -1
 
 	def set_threshold(self, value):
-		self.threshold = value
+		self._threshold = value
 
 	def is_compression_enabled(self):
-		return self.threshold >= 0
+		return self._threshold >= 0
 
 	def get_threshold(self):
-		return self.threshold
+		return self._threshold
 
 	def set_state(self, state):
-		self.state = state
+		self._state = state
 
 	def get_state(self):
-		return self.state
+		return self._state
 
 	def write(self, stream, packet):
-		if packet.__class__.PACKET_DIRECTION != self.direction:
+		if packet.__class__.PACKET_DIRECTION != self._direction:
 			raise ValueError(packet_class.__name__ + " has other direction")
 
 		buf = StringIO()
@@ -48,7 +48,7 @@ class PacketSerializer(object):
 		if self.is_compression_enabled():
 			buf = StringIO()
 
-			if len(data) >= self.threshold:
+			if len(data) >= self._threshold:
 				StreamIO.write_varint(buf, len(data))
 				data = zlib.compress(data)
 			else:
@@ -85,28 +85,28 @@ class PacketSerializer(object):
 		packet_size -= StreamIO.size_varint(packet_id)
 		packet_class = None
 
-		if self.state == ProtocolState.HANDSHAKING:
+		if self._state == ProtocolState.HANDSHAKING:
 			for name, cls in Handshaking.__dict__.items():
 				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
 						packet_class = cls
 						break
-		elif self.state == ProtocolState.STATUS:
+		elif self._state == ProtocolState.STATUS:
 			for name, cls in Status.__dict__.items():
 				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
 						packet_class = cls
 						break
-		elif self.state == ProtocolState.LOGIN:
+		elif self._state == ProtocolState.LOGIN:
 			for name, cls in Login.__dict__.items():
 				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
 						packet_class = cls
 						break
-		elif self.state == ProtocolState.PLAY:
+		elif self._state == ProtocolState.PLAY:
 			for name, cls in Play.__dict__.items():
 				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
 						packet_class = cls
 						break
 
