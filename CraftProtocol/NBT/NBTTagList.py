@@ -12,49 +12,49 @@ class NBTTagList(NBTBase):
 
 	def __init__(self, type, values = []):
 		NBTBase.__init__(self)
-		self.type = type
-		self.values = values
+		self._type = type
+		self._values = values
 
 	def get(self):
-		return self.values
+		return self._values
 
 	def get_type(self):
-		return self.type
+		return self._type
 
 	def __getitem__(self, index):
-		return self.values[index]
+		return self._values[index]
 
 	def __setitem__(self, index, value):
-		self.values[index] = value
+		self._values[index] = value
 
 	def __delitem__(self, index):
-		del self.values[index]
+		del self._values[index]
 
 	def __iter__(self):
-		return self.values.__iter__()
+		return self._values.__iter__()
 
 	def __contains__(self, item):
-		return self.values.__contains__(item)
+		return self._values.__contains__(item)
 
 	def __len__(self):
-		return len(self.values)
+		return len(self._values)
 
 	def append(self, x):
-		if x.__class__ != self.tag.type:
-			raise ValueError("arg must be " + self.tag.type.__name__)
+		if x.__class__ != self._type:
+			raise ValueError("arg must be " + self._type.__name__)
 			
-		self.values.append(x)
+		self._values.append(x)
 
 	def remove(self, x):
-		self.values.remove(x)
+		self._values.remove(x)
 
 	@staticmethod
 	def write(stream, tag):
-		StreamIO.write_ubyte(stream, tag.type.TYPE_ID)
-		StreamIO.write_int(stream, len(tag.values))
+		StreamIO.write_ubyte(stream, tag._type.TYPE_ID)
+		StreamIO.write_int(stream, len(tag._values))
 
-		for i in tag.values:
-			tag.type.write(stream, i)
+		for i in tag._values:
+			tag._type.write(stream, i)
 
 	@staticmethod
 	def read(stream):
@@ -62,10 +62,10 @@ class NBTTagList(NBTBase):
 		type = None
 		values = []
 
-		for name, item in sys.modules[__package__].__dict__.items():
-			if isinstance(item, types.TypeType) and item != NBTBase and issubclass(item, NBTBase):
-				if type_id == item.TYPE_ID:
-					type = item
+		for name, cls in sys.modules[__package__].__dict__.items():
+			if isinstance(cls, types.TypeType) and issubclass(cls, NBTBase):
+				if type_id == cls.TYPE_ID:
+					type = cls
 					break
 
 		if type == None:

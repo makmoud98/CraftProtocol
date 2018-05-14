@@ -6,7 +6,7 @@ class OpenInventoryEvent(BaseEvent):
 
 	def __init__(self, player, inventory):
 		BaseEvent.__init__(self, player)
-		self.inventory = inventory
+		self._inventory = inventory
 
 	def get_inventory(self):
-		return self.inventory
+		return self._inventory

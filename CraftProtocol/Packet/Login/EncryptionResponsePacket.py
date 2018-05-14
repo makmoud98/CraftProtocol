@@ -11,19 +11,19 @@ class EncryptionResponsePacket(BasePacket):
 
 	def __init__(self, shared_secret, verify_token):
 		BasePacket.__init__(self)
-		self.shared_secret = shared_secret
-		self.verify_token = verify_token
+		self._shared_secret = shared_secret
+		self._verify_token = verify_token
 
 	def get_shared_secret(self):
-		return self.shared_secret
+		return self._shared_secret
 
 	def get_verify_token(self):
-		return self.verify_token
+		return self._verify_token
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.shared_secret)
-		StreamIO.write_string(stream, packet.verify_token)
+		StreamIO.write_string(stream, packet._shared_secret)
+		StreamIO.write_string(stream, packet._verify_token)
 
 	@staticmethod
 	def read(stream, packet_size):

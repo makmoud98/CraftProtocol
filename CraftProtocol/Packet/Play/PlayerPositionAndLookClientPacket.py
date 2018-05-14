@@ -11,44 +11,44 @@ class PlayerPositionAndLookClientPacket(BasePacket):
 
 	def __init__(self, x, y, z, yaw, pitch, flags, teleport_id):
 		BasePacket.__init__(self)
-		self.x = x
-		self.y = y
-		self.z = z
-		self.yaw = yaw
-		self.pitch = pitch
-		self.flags = flags
-		self.teleport_id = teleport_id
+		self._x = x
+		self._y = y
+		self._z = z
+		self._yaw = yaw
+		self._pitch = pitch
+		self._flags = flags
+		self._teleport_id = teleport_id
 
 	def get_x(self):
-		return self.x
+		return self._x
 
 	def get_y(self):
-		return self.y
+		return self._y
 
 	def get_z(self):
-		return self.z
+		return self._z
 
 	def get_yaw(self):
-		return self.yaw
+		return self._yaw
 
 	def get_pitch(self):
-		return self.pitch
+		return self._pitch
 
 	def get_flags(self):
-		return self.flags
+		return self._flags
 
 	def get_teleport_id(self):
-		return self.teleport_id
+		return self._teleport_id
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_double(stream, packet.x)
-		StreamIO.write_double(stream, packet.y)
-		StreamIO.write_double(stream, packet.z)
-		StreamIO.write_float(stream, packet.yaw)
-		StreamIO.write_float(stream, packet.pitch)
-		StreamIO.write_byte(stream, packet.flags)
-		StreamIO.write_varint(stream, packet.teleport_id)
+		StreamIO.write_double(stream, packet._x)
+		StreamIO.write_double(stream, packet._y)
+		StreamIO.write_double(stream, packet._z)
+		StreamIO.write_float(stream, packet._yaw)
+		StreamIO.write_float(stream, packet._pitch)
+		StreamIO.write_byte(stream, packet._flags)
+		StreamIO.write_varint(stream, packet._teleport_id)
 
 	@staticmethod
 	def read(stream, packet_size):

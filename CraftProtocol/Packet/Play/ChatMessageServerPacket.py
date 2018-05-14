@@ -11,14 +11,14 @@ class ChatMessageServerPacket(BasePacket):
 
 	def __init__(self, text):
 		BasePacket.__init__(self)
-		self.text = text
+		self._text = text
 
 	def get_text(self):
-		return self.text
+		return self._text
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.text.encode("utf8"))
+		StreamIO.write_string(stream, packet._text.encode("utf8"))
 
 	@staticmethod
 	def read(stream, packet_size):

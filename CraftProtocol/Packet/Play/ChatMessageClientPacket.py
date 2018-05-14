@@ -11,19 +11,19 @@ class ChatMessageClientPacket(BasePacket):
 
 	def __init__(self, chat, position):
 		BasePacket.__init__(self)
-		self.chat = chat
-		self.position = position
+		self._chat = chat
+		self._position = position
 
 	def get_chat(self):
-		return self.chat
+		return self._chat
 
 	def get_position(self):
-		return self.position
+		return self._position
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.chat.encode("utf8"))
-		StreamIO.write_byte(stream, packet.position)
+		StreamIO.write_string(stream, packet._chat.encode("utf8"))
+		StreamIO.write_byte(stream, packet._position)
 
 	@staticmethod
 	def read(stream, packet_size):

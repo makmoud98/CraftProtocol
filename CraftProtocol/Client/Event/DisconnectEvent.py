@@ -6,10 +6,10 @@ class DisconnectEvent(BaseEvent):
 
 	def __init__(self, player, reason):
 		BaseEvent.__init__(self, player)
-		self.reason = reason
+		self._reason = reason
 
 	def get_reason(self):
-		return self.reason
+		return self._reason
 
 	def cancel(self):
 		raise ValueError("DisconnectEvent cannot be cancelled")

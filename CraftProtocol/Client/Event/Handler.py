@@ -6,7 +6,6 @@ import types
 def Handler(func = None, priority = HandlerPriority.NORMAL, ignore_cancelled = False):
 	def _Handler_decorator(func):
 		handler = func
-
 		handler._CraftProtocol = {}
 
 		handler._CraftProtocol["priority"] = priority

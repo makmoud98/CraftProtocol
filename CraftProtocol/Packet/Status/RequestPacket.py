@@ -13,7 +13,7 @@ class RequestPacket(BasePacket):
 
 	@staticmethod
 	def write(stream, packet):
-		pass
+		pass # No fields
 
 	@staticmethod
 	def read(stream, packet_size):

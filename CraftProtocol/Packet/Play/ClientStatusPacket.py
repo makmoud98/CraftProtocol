@@ -6,6 +6,12 @@ from ..PacketDirection import PacketDirection
 
 class ClientStatusPacket(BasePacket):
 
+	class ClientStatus(object):
+
+		PERFORM_RESPAWN = 0
+		REQUEST_STATS = 1
+		OPEN_INVENTORY = 2
+
 	PACKET_ID = 0x03
 	PACKET_DIRECTION = PacketDirection.SERVERBOUND
 

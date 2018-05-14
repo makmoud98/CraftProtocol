@@ -3,10 +3,10 @@
 class KickError(Exception):
 
 	def __init__(self, reason):
-		self.reason = reason
+		self._reason = reason
 
 	def get_reason(self):
-		return self.reason
+		return self._reason
 
 	def __str__(self):
 		return self.get_reason()

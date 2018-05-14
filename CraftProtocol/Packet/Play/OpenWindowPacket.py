@@ -11,35 +11,35 @@ class OpenWindowPacket(BasePacket):
 
 	def __init__(self, window_id, window_type, window_title, slots_number, entity_id):
 		BasePacket.__init__(self)
-		self.window_id = window_id
-		self.window_type = window_type
-		self.window_title = window_title
-		self.slots_number = slots_number
-		self.entity_id = entity_id
+		self._window_id = window_id
+		self._window_type = window_type
+		self._window_title = window_title
+		self._slots_number = slots_number
+		self._entity_id = entity_id
 
 	def get_window_id(self):
-		return self.window_id
+		return self._window_id
 
 	def get_window_type(self):
-		return self.window_type
+		return self._window_type
 
 	def get_window_title(self):
-		return self.window_title
+		return self._window_title
 
 	def get_slots_number(self):
-		return self.slots_number
+		return self._slots_number
 
 	def get_entity_id(self):
-		return self.entity_id
+		return self._entity_id
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_ubyte(stream, packet.window_id)
-		StreamIO.write_string(stream, packet.window_type.encode("utf8"))
-		StreamIO.write_string(stream, packet.window_title.encode("utf8"))
-		StreamIO.write_ubyte(stream, packet.slots_number)
+		StreamIO.write_ubyte(stream, packet._window_id)
+		StreamIO.write_string(stream, packet._window_type.encode("utf8"))
+		StreamIO.write_string(stream, packet._window_title.encode("utf8"))
+		StreamIO.write_ubyte(stream, packet._slots_number)
 		if packet.window_type == "EntityHorse":
-			StreamIO.write_int(stream, packet.entity_id)
+			StreamIO.write_int(stream, packet._entity_id)
 
 	@staticmethod
 	def read(stream, packet_size):	

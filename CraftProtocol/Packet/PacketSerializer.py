@@ -86,25 +86,29 @@ class PacketSerializer(object):
 		packet_class = None
 
 		if self.state == ProtocolState.HANDSHAKING:
-			for name, item in Handshaking.__dict__.items():
-				if isinstance(item, types.TypeType) and issubclass(item, BasePacket):
-					if packet_id == item.PACKET_ID and PacketDirection.reverse(item.PACKET_DIRECTION) == self.direction:
-						packet_class = item
+			for name, cls in Handshaking.__dict__.items():
+				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+						packet_class = cls
+						break
 		elif self.state == ProtocolState.STATUS:
-			for name, item in Status.__dict__.items():
-				if isinstance(item, types.TypeType) and issubclass(item, BasePacket):
-					if packet_id == item.PACKET_ID and PacketDirection.reverse(item.PACKET_DIRECTION) == self.direction:
-						packet_class = item
+			for name, cls in Status.__dict__.items():
+				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+						packet_class = cls
+						break
 		elif self.state == ProtocolState.LOGIN:
-			for name, item in Login.__dict__.items():
-				if isinstance(item, types.TypeType) and issubclass(item, BasePacket):
-					if packet_id == item.PACKET_ID and PacketDirection.reverse(item.PACKET_DIRECTION) == self.direction:
-						packet_class = item
+			for name, cls in Login.__dict__.items():
+				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+						packet_class = cls
+						break
 		elif self.state == ProtocolState.PLAY:
-			for name, item in Play.__dict__.items():
-				if isinstance(item, types.TypeType) and issubclass(item, BasePacket):
-					if packet_id == item.PACKET_ID and PacketDirection.reverse(item.PACKET_DIRECTION) == self.direction:
-						packet_class = item
+			for name, cls in Play.__dict__.items():
+				if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
+					if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self.direction:
+						packet_class = cls
+						break
 
 		if packet_class == None:
 			buf.close()

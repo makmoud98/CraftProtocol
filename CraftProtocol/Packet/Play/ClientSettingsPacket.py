@@ -11,39 +11,39 @@ class ClientSettingsPacket(BasePacket):
 
 	def __init__(self, locale, view_distance, chat_mode, chat_colors, skin_parts, main_hand):
 		BasePacket.__init__(self)
-		self.locale = locale
-		self.view_distance = view_distance
-		self.chat_mode = chat_mode
-		self.chat_colors = chat_colors
-		self.skin_parts = skin_parts
-		self.main_hand = main_hand
+		self._locale = locale
+		self._view_distance = view_distance
+		self._chat_mode = chat_mode
+		self._chat_colors = chat_colors
+		self._skin_parts = skin_parts
+		self._main_hand = main_hand
 
 	def get_locale(self):
-		return self.locale
+		return self._locale
 
 	def get_view_distance(self):
-		return self.view_distance
+		return self._view_distance
 
 	def get_chat_mode(self):
-		return self.chat_mode
+		return self._chat_mode
 
 	def is_chat_colors(self):
-		return self.chat_colors
+		return self._chat_colors
 
 	def get_skin_parts(self):
-		return self.skin_parts
+		return self._skin_parts
 
 	def get_main_hand(self):
-		return self.main_hand
+		return self._main_hand
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.locale)
-		StreamIO.write_byte(stream, packet.view_distance)
-		StreamIO.write_varint(stream, packet.chat_mode)
-		StreamIO.write_bool(stream, packet.chat_colors)
-		StreamIO.write_ubyte(stream, packet.skin_parts)
-		StreamIO.write_varint(stream, packet.main_hand)
+		StreamIO.write_string(stream, packet._locale)
+		StreamIO.write_byte(stream, packet._view_distance)
+		StreamIO.write_varint(stream, packet._chat_mode)
+		StreamIO.write_bool(stream, packet._chat_colors)
+		StreamIO.write_ubyte(stream, packet._skin_parts)
+		StreamIO.write_varint(stream, packet._main_hand)
 
 	@staticmethod
 	def read(stream, packet_size):	

@@ -9,42 +9,42 @@ class NBTTagIntArray(NBTBase):
 
 	def __init__(self, values = []):
 		NBTBase.__init__(self)
-		self.values = values
+		self._values = values
 
 	def get(self):
-		return self.values
+		return self._values
 
 	def __getitem__(self, index):
-		return self.values[index]
+		return self._values[index]
 
 	def __setitem__(self, index, value):
-		self.values[index] = value
+		self._values[index] = value
 
 	def __delitem__(self, index):
-		del self.values[index]
+		del self._values[index]
 
 	def __iter__(self):
-		return self.values.__iter__()
+		return self._values.__iter__()
 
 	def __contains__(self, item):
-		return self.values.__contains__(item)
+		return self._values.__contains__(item)
 
 	def __len__(self):
-		return len(self.values)
+		return len(self._values)
 
 	def append(self, x):
 		if type(x) != int:
 			raise ValueError("arg must be int")
 
-		self.values.append(x)
+		self._values.append(x)
 
 	def remove(self, x):
-		self.values.remove(x)
+		self._values.remove(x)
 
 	@staticmethod
 	def write(stream, tag):
-		StreamIO.write_int(stream, len(tag.values))
-		for i in self.values:
+		StreamIO.write_int(stream, len(tag._values))
+		for i in self._values:
 			StreamIO.write_int(stream, i)
 
 	@staticmethod

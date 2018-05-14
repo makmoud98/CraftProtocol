@@ -11,14 +11,14 @@ class TeleportConfirmPacket(BasePacket):
 
 	def __init__(self, teleport_id):
 		BasePacket.__init__(self)
-		self.teleport_id = teleport_id
+		self._teleport_id = teleport_id
 
 	def get_teleport_id(self):
-		return self.teleport_id
+		return self._teleport_id
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_varint(stream, packet.teleport_id)
+		StreamIO.write_varint(stream, packet._teleport_id)
 
 	@staticmethod
 	def read(stream, packet_size):	

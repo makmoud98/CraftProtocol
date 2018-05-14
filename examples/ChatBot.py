@@ -24,7 +24,7 @@ class ChatBot(object):
 		print "Disconnected: " + event.get_reason()
 
 def main():
-	server = CraftProtocol.Client.CraftServer("localhost", 25565)
+	server = CraftProtocol.Client.CraftServer("localhost", 25565, CraftProtocol.ProtocolVersion.MC_1_10)
 	server.ping()
 	player = None
 	try:

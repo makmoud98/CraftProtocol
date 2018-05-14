@@ -11,29 +11,29 @@ class HandshakePacket(BasePacket):
 
 	def __init__(self, protocol, hostname, port, next_state):
 		BasePacket.__init__(self)
-		self.protocol = protocol
-		self.hostname = hostname
-		self.port = port
-		self.next_state = next_state
+		self._protocol = protocol
+		self._hostname = hostname
+		self._port = port
+		self._next_state = next_state
 
 	def get_protocol():
-		return self.protocol
+		return self._protocol
 
 	def get_hostname():
-		return self.hostname
+		return self._hostname
 
 	def get_port():
-		return self.port
+		return self._port
 
 	def get_next_state():
-		return self.next_state
+		return self._next_state
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_varint(stream, packet.protocol)
-		StreamIO.write_string(stream, packet.hostname.encode("utf8"))
-		StreamIO.write_ushort(stream, packet.port)
-		StreamIO.write_varint(stream, packet.next_state)
+		StreamIO.write_varint(stream, packet._protocol)
+		StreamIO.write_string(stream, packet._hostname.encode("utf8"))
+		StreamIO.write_ushort(stream, packet._port)
+		StreamIO.write_varint(stream, packet._next_state)
 
 	@staticmethod
 	def read(stream, packet_size):

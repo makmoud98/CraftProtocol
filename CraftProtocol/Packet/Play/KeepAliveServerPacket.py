@@ -11,14 +11,14 @@ class KeepAliveServerPacket(BasePacket):
 
 	def __init__(self, id):
 		BasePacket.__init__(self)
-		self.id = id
+		self._id = id
 
 	def get_id(self):
-		return self.id
+		return self._id
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_varint(stream, packet.id)
+		StreamIO.write_varint(stream, packet._id)
 
 	@staticmethod
 	def read(stream, packet_size):	

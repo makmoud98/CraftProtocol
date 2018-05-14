@@ -9,19 +9,19 @@ class UseItemPacket(BasePacket):
 	PACKET_ID = 0x1D
 	PACKET_DIRECTION = PacketDirection.SERVERBOUND
 
-	def __init__(self, hand):
+	def __init__(self, hand_type):
 		BasePacket.__init__(self)
-		self.hand = hand
+		self._hand_type = hand_type
 
 	def get_hand(self):
-		return self.hand
+		return self._hand_type
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_varint(stream, packet.hand)
+		StreamIO.write_varint(stream, packet._hand_type)
 
 	@staticmethod
 	def read(stream, packet_size):	
-		hand = StreamIO.read_varint(stream)
+		hand_type = StreamIO.read_varint(stream)
 
-		return UseItemPacket(hand)
+		return UseItemPacket(hand_type)

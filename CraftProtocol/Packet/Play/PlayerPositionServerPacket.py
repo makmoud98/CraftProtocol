@@ -11,29 +11,29 @@ class PlayerPositionServerPacket(BasePacket):
 
 	def __init__(self, x, y, z, on_ground):
 		BasePacket.__init__(self)
-		self.x = x
-		self.y = y
-		self.z = z
-		self.on_ground = on_ground
+		self._x = x
+		self._y = y
+		self._z = z
+		self._on_ground = on_ground
 
 	def get_x(self):
-		return self.x
+		return self._x
 
 	def get_y(self):
-		return self.y
+		return self._y
 
 	def get_z(self):
-		return self.z
+		return self._z
 
 	def is_on_ground(self):
-		return self.on_ground
+		return self._on_ground
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_double(stream, packet.x)
-		StreamIO.write_double(stream, packet.y)
-		StreamIO.write_double(stream, packet.z)
-		StreamIO.write_bool(stream, packet.on_ground)
+		StreamIO.write_double(stream, packet._x)
+		StreamIO.write_double(stream, packet._y)
+		StreamIO.write_double(stream, packet._z)
+		StreamIO.write_bool(stream, packet._on_ground)
 
 	@staticmethod
 	def read(stream, packet_size):

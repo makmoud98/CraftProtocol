@@ -11,19 +11,19 @@ class LoginSuccessPacket(BasePacket):
 
 	def __init__(self, uuid, username):
 		BasePacket.__init__(self)
-		self.uuid = uuid
-		self.username = username
+		self._uuid = uuid
+		self._username = username
 
 	def get_uuid(self):
-		return self.uuid
+		return self._uuid
 
 	def get_username(self):
-		return self.username
+		return self._username
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.uuid.encode("utf8"))
-		StreamIO.write_string(stream, packet.username.encode("utf8"))
+		StreamIO.write_string(stream, packet._uuid.encode("utf8"))
+		StreamIO.write_string(stream, packet._username.encode("utf8"))
 
 	@staticmethod
 	def read(stream, packet_size):

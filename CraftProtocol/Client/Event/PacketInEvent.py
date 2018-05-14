@@ -6,10 +6,10 @@ class PacketInEvent(BaseEvent):
 
 	def __init__(self, player, packet):
 		BaseEvent.__init__(self, player)
-		self.packet = packet
+		self._packet = packet
 
 	def get_packet(self):
-		return self.packet
+		return self._packet
 
 	def set_packet(self, packet):
-		self.packet = packet
+		self._packet = packet

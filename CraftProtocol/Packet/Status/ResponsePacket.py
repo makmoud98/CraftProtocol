@@ -11,14 +11,14 @@ class ResponsePacket(BasePacket):
 
 	def __init__(self, json):
 		BasePacket.__init__(self)
-		self.json = json
+		self._json = json
 
 	def get_json(self):
-		return self.json
+		return self._json
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.json.encode("utf8"))
+		StreamIO.write_string(stream, packet._json.encode("utf8"))
 
 	@staticmethod
 	def read(stream, packet_size):

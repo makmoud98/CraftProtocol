@@ -11,19 +11,22 @@ import socket
 
 class CraftServer(object):
 
-	def __init__(self, hostname, port):
-		self.hostname = hostname
-		self.port = port
-		self.protocol = ProtocolVersion.MC_1_10 # currently only supported protocol version
+	def __init__(self, hostname, port, protocol):
+		self._hostname = hostname
+		self._port = port
+		self._protocol = protocol
+
+	def get_protocol(self):
+		return self._protocol
 
 	def ping(self):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.settimeout(5)
 
-		sock.connect((self.hostname, self.port))
+		sock.connect((self._hostname, self._port))
 		serializer = PacketSerializer(PacketDirection.SERVERBOUND)
 
-		serializer.write(sock, Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.STATUS))
+		serializer.write(sock, Handshaking.HandshakePacket(self._protocol, self._hostname, self._port, ProtocolState.STATUS))
 		serializer.set_state(ProtocolState.STATUS)
 		serializer.write(sock, Status.RequestPacket())
 
@@ -44,10 +47,10 @@ class CraftServer(object):
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			sock.settimeout(10)
 
-			sock.connect((self.hostname, self.port))
+			sock.connect((self._hostname, self._port))
 			serializer = PacketSerializer(PacketDirection.SERVERBOUND)
 
-			serializer.write(sock, Handshaking.HandshakePacket(self.protocol, self.hostname, self.port, ProtocolState.LOGIN))
+			serializer.write(sock, Handshaking.HandshakePacket(self._protocol, self._hostname, self._port, ProtocolState.LOGIN))
 			serializer.set_state(ProtocolState.LOGIN)
 			serializer.write(sock, Login.LoginStartPacket(username))
 

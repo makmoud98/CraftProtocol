@@ -11,14 +11,14 @@ class DisconnectPacket(BasePacket):
 
 	def __init__(self, reason):
 		BasePacket.__init__(self)
-		self.reason = reason
+		self._reason = reason
 
 	def get_reason(self):
-		return self.reason
+		return self._reason
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_string(stream, packet.reason.encode("utf8"))
+		StreamIO.write_string(stream, packet._reason.encode("utf8"))
 
 	@staticmethod
 	def read(stream, packet_size):

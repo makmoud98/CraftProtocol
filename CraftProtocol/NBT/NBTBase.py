@@ -2,7 +2,7 @@
 
 class NBTBase(object):
 
-	TYPE_ID = 0xFF
+	TYPE_ID = None
 
 	def __init__(self):
 		pass

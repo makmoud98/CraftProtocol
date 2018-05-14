@@ -13,43 +13,43 @@ class ClickWindowPacket(BasePacket):
 
 	def __init__(self, window_id, slot, button, action, mode, itemstack):
 		BasePacket.__init__(self)
-		self.window_id = window_id
-		self.slot = slot
-		self.button = button
-		self.action = action
-		self.mode = mode
-		self.itemstack = itemstack
+		self._window_id = window_id
+		self._slot = slot
+		self._button = button
+		self._action = action
+		self._mode = mode
+		self._itemstack = itemstack
 
 	def get_window_id(self):
-		return self.window_id
+		return self._window_id
 
 	def get_slot(self):
-		return self.slot
+		return self._slot
 
 	def get_button(self):
-		return self.button
+		return self._button
 
 	def get_action(self):
-		return self.action
+		return self._action
 
 	def get_mode(self):
-		return self.mode
+		return self._mode
 
 	def get_itemstack(self):
-		return self.itemstack
+		return self._itemstack
 
 	@staticmethod
 	def write(stream, packet):
-		StreamIO.write_ubyte(stream, packet.window_id)
-		StreamIO.write_short(stream, packet.slot)
-		StreamIO.write_byte(stream, packet.button)
-		StreamIO.write_short(stream, packet.action)
-		StreamIO.write_varint(stream, packet.mode)
-		StreamIO.write_short(stream, packet.itemstack.get_id())
-		if packet.itemstack.get_id() != -1:
-			StreamIO.write_byte(stream, packet.itemstack.get_count())
-			StreamIO.write_short(stream, packet.itemstack.get_damage())
-			NBTSerializer.write(stream, packet.itemstack.get_tag())
+		StreamIO.write_ubyte(stream, packet._window_id)
+		StreamIO.write_short(stream, packet._slot)
+		StreamIO.write_byte(stream, packet._button)
+		StreamIO.write_short(stream, packet._action)
+		StreamIO.write_varint(stream, packet._mode)
+		StreamIO.write_short(stream, packet._itemstack.get_id())
+		if packet._itemstack.get_id() != -1:
+			StreamIO.write_byte(stream, packet._itemstack.get_count())
+			StreamIO.write_short(stream, packet._itemstack.get_damage())
+			NBTSerializer.write(stream, packet._itemstack.get_tag())
 
 	@staticmethod
 	def read(stream, packet_size):	

@@ -8,10 +8,9 @@ from ChatSerializer import ChatSerializer
 from ProtocolState import ProtocolState
 from ProtocolVersion import ProtocolVersion
 from ItemStack import ItemStack
-from ClientStatus import ClientStatus
 from Hand import Hand
-from ChatMode import ChatMode
 from Inventory import Inventory
+from ChatMode import ChatMode
 from HandType import HandType
 
 __version__ = VersionConstants.VERSION

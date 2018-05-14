@@ -6,10 +6,10 @@ class ChatSendEvent(BaseEvent):
 
 	def __init__(self, player, text):
 		BaseEvent.__init__(self, player)
-		self.text = text
+		self._text = text
 
 	def get_text(self):
-		return self.text
+		return self._text
 
 	def set_text(self, text):
-		self.text = text
+		self._text = text
