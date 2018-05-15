@@ -3,23 +3,23 @@
 from NBTBase import NBTBase
 from ..StreamIO import StreamIO
 
+
 class NBTTagFloat(NBTBase):
+    TYPE_ID = 0x05
 
-	TYPE_ID = 0x05
+    def __init__(self, value):
+        NBTBase.__init__(self)
+        self._value = value
 
-	def __init__(self, value):
-		NBTBase.__init__(self)
-		self._value = value
+    def get(self):
+        return self._value
 
-	def get(self):
-		return self._value
+    @staticmethod
+    def write(stream, tag):
+        StreamIO.write_float(stream, tag._value)
 
-	@staticmethod
-	def write(stream, tag):
-		StreamIO.write_float(stream, tag._value)
+    @staticmethod
+    def read(stream):
+        value = StreamIO.read_float(stream)
 
-	@staticmethod
-	def read(stream):
-		value = StreamIO.read_float(stream)
-
-		return NBTTagFloat(value)
+        return NBTTagFloat(value)

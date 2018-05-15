@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 from NBTBase import NBTBase
-from NBTTagCompound import NBTTagCompound
-from NBTTagString import NBTTagString
-from NBTTagLong import NBTTagLong
-from NBTTagFloat import NBTTagFloat
-from NBTTagDouble import NBTTagDouble
-from NBTTagShort import NBTTagShort
-from NBTTagInt import NBTTagInt
+from NBTSerializer import NBTSerializer
 from NBTTagByte import NBTTagByte
 from NBTTagByteArray import NBTTagByteArray
-from NBTTagLongArray import NBTTagLongArray
-from NBTTagList import NBTTagList
+from NBTTagCompound import NBTTagCompound
+from NBTTagDouble import NBTTagDouble
+from NBTTagFloat import NBTTagFloat
+from NBTTagInt import NBTTagInt
 from NBTTagIntArray import NBTTagIntArray
-from NBTSerializer import NBTSerializer
+from NBTTagList import NBTTagList
+from NBTTagLong import NBTTagLong
+from NBTTagLongArray import NBTTagLongArray
+from NBTTagShort import NBTTagShort
+from NBTTagString import NBTTagString

@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-from HandlerPriority import HandlerPriority
 from BaseEvent import BaseEvent
-from PacketOutEvent import PacketOutEvent
-from PacketInEvent import PacketInEvent
-from DisconnectEvent import DisconnectEvent
 from ChatReceiveEvent import ChatReceiveEvent
 from ChatSendEvent import ChatSendEvent
-from TeleportEvent import TeleportEvent
-from ServerTeleportEvent import ServerTeleportEvent
-from OpenInventoryEvent import OpenInventoryEvent
-from UpdateInventoryEvent import UpdateInventoryEvent
-from LoginEvent import LoginEvent
-from SpawnEvent import SpawnEvent
+from DisconnectEvent import DisconnectEvent
 from Handler import Handler
+from HandlerPriority import HandlerPriority
+from LoginEvent import LoginEvent
+from OpenInventoryEvent import OpenInventoryEvent
+from PacketInEvent import PacketInEvent
+from PacketOutEvent import PacketOutEvent
+from ServerTeleportEvent import ServerTeleportEvent
+from CloseInventoryEvent import CloseInventoryEvent
+from SpawnEvent import SpawnEvent
+from TeleportEvent import TeleportEvent
+from UpdateInventoryEvent import UpdateInventoryEvent

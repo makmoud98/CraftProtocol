@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 
 from HandlerPriority import HandlerPriority
-import types
 
-def Handler(func = None, priority = HandlerPriority.NORMAL, ignore_cancelled = False):
-	def _Handler_decorator(func):
-		handler = func
-		handler._CraftProtocol = {}
 
-		handler._CraftProtocol["priority"] = priority
-		handler._CraftProtocol["ignore_cancelled"] = ignore_cancelled
+def Handler(func=None, priority=HandlerPriority.NORMAL, ignore_cancelled=False):
+    def _Handler_decorator(func):
+        handler = func
+        handler._CraftProtocol = {}
 
-		return handler
+        handler._CraftProtocol["priority"] = priority
+        handler._CraftProtocol["ignore_cancelled"] = ignore_cancelled
 
-	if callable(func):
-		return _Handler_decorator(func)
+        return handler
 
-	if func != None:
-		raise ValueError("Please use keyword arguments")
+    if callable(func):
+        return _Handler_decorator(func)
 
-	return _Handler_decorator
+    if func != None:
+        raise ValueError("Please use keyword arguments")
+
+    return _Handler_decorator

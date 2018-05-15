@@ -2,5 +2,6 @@
 
 from BaseEvent import BaseEvent
 
+
 class SpawnEvent(BaseEvent):
-	pass
+    pass

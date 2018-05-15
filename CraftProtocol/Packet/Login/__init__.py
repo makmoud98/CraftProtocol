@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from LoginStartPacket import LoginStartPacket
-from SetCompressionPacket import SetCompressionPacket
 from DisconnectPacket import DisconnectPacket
-from LoginSuccessPacket import LoginSuccessPacket
 from EncryptionRequestPacket import EncryptionRequestPacket
 from EncryptionResponsePacket import EncryptionResponsePacket
+from LoginStartPacket import LoginStartPacket
+from LoginSuccessPacket import LoginSuccessPacket
+from SetCompressionPacket import SetCompressionPacket

@@ -3,7 +3,7 @@
 from BaseEvent import BaseEvent
 
 
-class OpenInventoryEvent(BaseEvent):
+class CloseInventoryEvent(BaseEvent):
 
     def __init__(self, player, inventory):
         BaseEvent.__init__(self, player)

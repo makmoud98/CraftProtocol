@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-import Packet
 import Client
 import NBT
-from VersionConstants import VersionConstants
+import Packet
+from ChatMode import ChatMode
 from ChatSerializer import ChatSerializer
+from Hand import Hand
+from HandType import HandType
+from Inventory import Inventory
+from ItemStack import ItemStack
+from ClientStatus import ClientStatus
 from ProtocolState import ProtocolState
 from ProtocolVersion import ProtocolVersion
-from ItemStack import ItemStack
-from Hand import Hand
-from Inventory import Inventory
-from ChatMode import ChatMode
-from HandType import HandType
+from VersionConstants import VersionConstants
 
 __version__ = VersionConstants.VERSION

@@ -1,33 +1,27 @@
 #!/usr/bin/env python
 
-from ...StreamIO import StreamIO
 from ..BasePacket import BasePacket
 from ..PacketDirection import PacketDirection
+from ...StreamIO import StreamIO
+
 
 class ClientStatusPacket(BasePacket):
+    PACKET_ID = 0x03
+    PACKET_DIRECTION = PacketDirection.SERVERBOUND
 
-	class ClientStatus(object):
+    def __init__(self, action):
+        BasePacket.__init__(self)
+        self.action = action
 
-		PERFORM_RESPAWN = 0
-		REQUEST_STATS = 1
-		OPEN_INVENTORY = 2
+    def get_action(self):
+        return self.action
 
-	PACKET_ID = 0x03
-	PACKET_DIRECTION = PacketDirection.SERVERBOUND
+    @staticmethod
+    def write(stream, packet):
+        StreamIO.write_varint(stream, packet.action)
 
-	def __init__(self, action):
-		BasePacket.__init__(self)
-		self.action = action
+    @staticmethod
+    def read(stream, packet_size):
+        action = StreamIO.read_varint(stream)
 
-	def get_action(self):
-		return self.action
-
-	@staticmethod
-	def write(stream, packet):
-		StreamIO.write_varint(stream, packet.action)
-
-	@staticmethod
-	def read(stream, packet_size):	
-		action = StreamIO.read_varint(stream)
-
-		return ClientStatusPacket(action)
+        return ClientStatusPacket(action)

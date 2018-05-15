@@ -2,5 +2,6 @@
 
 from BaseEvent import BaseEvent
 
+
 class ServerTeleportEvent(BaseEvent):
-	pass
+    pass
