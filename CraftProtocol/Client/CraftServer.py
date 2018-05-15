@@ -70,7 +70,7 @@ class CraftServer(object):
                 response = serializer.read(sock)
 
             serializer.set_state(ProtocolState.PLAY)
-            return CraftPlayer(response.get_username, response.get_uuid, sock, serializer, self)
+            return CraftPlayer(response.get_username(), response.get_uuid(), sock, serializer, self)
         except socket.timeout:
             raise KickError("Timed out")
         except socket.error as ex:
