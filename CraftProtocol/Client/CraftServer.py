@@ -5,6 +5,7 @@ import socket
 
 from CraftPlayer import CraftPlayer
 from KickError import KickError
+from PingError import PingError
 from ..ChatSerializer import ChatSerializer
 from ..Packet import *
 from ..ProtocolState import ProtocolState
@@ -21,25 +22,28 @@ class CraftServer(object):
         return self._protocol
 
     def ping(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
 
-        sock.connect((self._hostname, self._port))
-        serializer = PacketSerializer(PacketDirection.SERVERBOUND)
+            sock.connect((self._hostname, self._port))
+            serializer = PacketSerializer(PacketDirection.SERVERBOUND)
 
-        serializer.write(sock,
+            serializer.write(sock,
                          Handshaking.HandshakePacket(self._protocol, self._hostname, self._port, ProtocolState.STATUS))
-        serializer.set_state(ProtocolState.STATUS)
-        serializer.write(sock, Status.RequestPacket())
+            serializer.set_state(ProtocolState.STATUS)
+            serializer.write(sock, Status.RequestPacket())
 
-        response = serializer.read(sock)
-        if not isinstance(response, Status.ResponsePacket):
-            return None
+            response = serializer.read(sock)
+            if not isinstance(response, Status.ResponsePacket):
+                return None
 
-        response = json.loads(response.get_json())
-        sock.close()
+            response = json.loads(response.get_json())
+            sock.close()
 
-        return response
+            return response
+        except:
+            raise PingError()
 
     def login(self, username):
         if len(username) > 16:
@@ -74,4 +78,6 @@ class CraftServer(object):
         except socket.timeout:
             raise KickError("Timed out")
         except socket.error as ex:
+            raise KickError(str(ex))
+        except EOFError as ex:
             raise KickError(str(ex))

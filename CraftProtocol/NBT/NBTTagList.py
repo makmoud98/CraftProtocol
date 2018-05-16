@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-import sys
-import types
-
 from NBTBase import NBTBase
+from NBTManager import NBTManager
 from ..StreamIO import StreamIO
 
 
@@ -59,17 +57,9 @@ class NBTTagList(NBTBase):
     @staticmethod
     def read(stream):
         type_id = StreamIO.read_ubyte(stream)
-        type = None
         values = []
 
-        for name, cls in sys.modules[__package__].__dict__.items():
-            if isinstance(cls, types.TypeType) and issubclass(cls, NBTBase):
-                if type_id == cls.TYPE_ID:
-                    type = cls
-                    break
-
-        if type == None:
-            raise IOError("Invalid NBTTagList type ID = " + hex(type_id))
+        type = NBTManager.get(type_id)
 
         values_len = StreamIO.read_int(stream)
         for i in range(values_len):

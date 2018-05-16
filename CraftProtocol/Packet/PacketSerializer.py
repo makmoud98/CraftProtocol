@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-import types
 import zlib
 from cStringIO import StringIO
 
-import Handshaking
-import Login
-import Play
-import Status
 from BasePacket import BasePacket
+from PacketManager import PacketManager
 from PacketDirection import PacketDirection
 from ..ProtocolState import ProtocolState
 from ..StreamIO import StreamIO
@@ -84,36 +80,12 @@ class PacketSerializer(object):
         buf = StringIO(data)
         packet_id = StreamIO.read_varint(buf)
         packet_size -= StreamIO.size_varint(packet_id)
-        packet_class = None
 
-        if self._state == ProtocolState.HANDSHAKING:
-            for name, cls in Handshaking.__dict__.items():
-                if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-                    if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
-                        packet_class = cls
-                        break
-        elif self._state == ProtocolState.STATUS:
-            for name, cls in Status.__dict__.items():
-                if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-                    if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
-                        packet_class = cls
-                        break
-        elif self._state == ProtocolState.LOGIN:
-            for name, cls in Login.__dict__.items():
-                if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-                    if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
-                        packet_class = cls
-                        break
-        elif self._state == ProtocolState.PLAY:
-            for name, cls in Play.__dict__.items():
-                if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):
-                    if packet_id == cls.PACKET_ID and PacketDirection.reverse(cls.PACKET_DIRECTION) == self._direction:
-                        packet_class = cls
-                        break
-
-        if packet_class == None:
+        try:
+            packet_class = PacketManager.get(self._state, PacketDirection.reverse(self._direction), packet_id)
+        except KeyError:
             buf.close()
-            return BasePacket()  # Unknown packet
+            return BasePacket() # Unknown packet
 
         packet = packet_class.read(buf, packet_size)
         buf.close()

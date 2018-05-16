@@ -2,5 +2,5 @@
 
 
 class VersionConstants(object):
-    VERSION = "0.0.9.1"
+    VERSION = "0.1.0"
     MC_VERSION = "1.10.x"

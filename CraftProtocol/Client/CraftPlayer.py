@@ -146,7 +146,7 @@ class CraftPlayer(object):
         player = event.get_player()
 
         if packet.__class__ == Play.DisconnectPacket:
-            player.disconnect(player, ChatSerializer.strip_colors(json.loads(packet.get_reason())))
+            player.disconnect(ChatSerializer.strip_colors(json.loads(packet.get_reason())))
         elif packet.__class__ == Play.ChatMessageClientPacket:
             if event.is_cancelled():
                 return
@@ -250,8 +250,6 @@ class CraftPlayer(object):
                 return
 
             player._lock.acquire()
-
-            update_inventory_event = None
 
             if packet.get_window_id() == player._main_inventory.get_id():
                 update_inventory_event = Event.UpdateInventoryEvent(player, player._main_inventory, packet.get_slots())

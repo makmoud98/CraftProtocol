@@ -30,4 +30,4 @@ class EncryptionResponsePacket(BasePacket):
         shared_secret = StreamIO.read_string(stream)
         verify_token = StreamIO.read_string(stream)
 
-        return EncryptionRequestPacket(shared_secret, verify_token)
+        return EncryptionResponsePacket(shared_secret, verify_token)

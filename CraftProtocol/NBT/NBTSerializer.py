@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import sys
+import types
+
 from NBTTagCompound import NBTTagCompound
 from ..StreamIO import StreamIO
 

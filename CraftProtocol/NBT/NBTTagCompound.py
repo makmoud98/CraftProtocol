@@ -4,6 +4,7 @@ import sys
 import types
 
 from NBTBase import NBTBase
+from NBTManager import NBTManager
 from ..StreamIO import StreamIO
 
 
@@ -62,15 +63,9 @@ class NBTTagCompound(NBTBase):
             if entry_name_len > 0:
                 entry_name = StreamIO.read(stream, entry_name_len).decode("utf8")
 
-            for name, cls in sys.modules[__package__].__dict__.items():
-                if isinstance(cls, types.TypeType) and issubclass(cls, NBTBase):
-                    if entry_type_id == cls.TYPE_ID:
-                        values[entry_name] = cls.read(stream)
-                        break
+            entry_type = NBTManager.get(entry_type_id)
 
-            if not entry_name in values:
-                raise IOError("Invalid NBTTagCompound entry ID = " + hex(entry_type_id))
-
+            values[entry_name] = entry_type.read(stream)
             entry_type_id = StreamIO.read_ubyte(stream)
 
         return NBTTagCompound(values)

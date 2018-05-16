@@ -16,16 +16,16 @@ class HandshakePacket(BasePacket):
         self._port = port
         self._next_state = next_state
 
-    def get_protocol():
+    def get_protocol(self):
         return self._protocol
 
-    def get_hostname():
+    def get_hostname(self):
         return self._hostname
 
-    def get_port():
+    def get_port(self):
         return self._port
 
-    def get_next_state():
+    def get_next_state(self):
         return self._next_state
 
     @staticmethod
