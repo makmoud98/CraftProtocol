@@ -3,3 +3,4 @@ dist/*
 MANIFEST
 .idea/*
 examples/bigtest.nbt
+pylint.log

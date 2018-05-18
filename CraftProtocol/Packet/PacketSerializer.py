@@ -3,11 +3,11 @@
 import zlib
 from cStringIO import StringIO
 
-from BasePacket import BasePacket
-from PacketManager import PacketManager
-from PacketDirection import PacketDirection
-from ..ProtocolState import ProtocolState
-from ..StreamIO import StreamIO
+from CraftProtocol.Packet.BasePacket import BasePacket
+from CraftProtocol.Packet.PacketManager import PacketManager
+from CraftProtocol.Packet.PacketDirection import PacketDirection
+from CraftProtocol.ProtocolState import ProtocolState
+from CraftProtocol.StreamIO import StreamIO
 
 
 class PacketSerializer(object):

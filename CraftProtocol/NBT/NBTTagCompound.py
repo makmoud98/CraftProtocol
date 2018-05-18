@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import types
-
-from NBTBase import NBTBase
-from NBTManager import NBTManager
-from ..StreamIO import StreamIO
+from CraftProtocol.StreamIO import StreamIO
+from CraftProtocol.NBT.NBTBase import NBTBase
+from CraftProtocol.NBT.NBTManager import NBTManager
 
 
 class NBTTagCompound(NBTBase):

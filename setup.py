@@ -23,7 +23,7 @@ setup(
     author_email="toranktto@gmail.com",
     url="https://github.com/Toranktto/CraftProtocol",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 2.7",
         "License :: OSI Approved :: MIT License"
     ]

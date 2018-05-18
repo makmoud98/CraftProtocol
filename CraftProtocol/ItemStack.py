@@ -3,8 +3,8 @@
 
 class ItemStack(object):
 
-    def __init__(self, id, count=0, damage=0, tag=None):
-        self._id = id
+    def __init__(self, item_id, count=0, damage=0, tag=None):
+        self._id = item_id
         self._count = count
         self._damage = damage
         self._tag = tag

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from DisconnectPacket import DisconnectPacket
-from EncryptionRequestPacket import EncryptionRequestPacket
-from EncryptionResponsePacket import EncryptionResponsePacket
-from LoginStartPacket import LoginStartPacket
-from LoginSuccessPacket import LoginSuccessPacket
-from SetCompressionPacket import SetCompressionPacket
+from CraftProtocol.Packet.Login.DisconnectPacket import DisconnectPacket
+from CraftProtocol.Packet.Login.EncryptionRequestPacket import EncryptionRequestPacket
+from CraftProtocol.Packet.Login.EncryptionResponsePacket import EncryptionResponsePacket
+from CraftProtocol.Packet.Login.LoginStartPacket import LoginStartPacket
+from CraftProtocol.Packet.Login.LoginSuccessPacket import LoginSuccessPacket
+from CraftProtocol.Packet.Login.SetCompressionPacket import SetCompressionPacket

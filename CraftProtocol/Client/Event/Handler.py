@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from HandlerPriority import HandlerPriority
+from CraftProtocol.Client.Event.HandlerPriority import HandlerPriority
 
 
 def Handler(func=None, priority=HandlerPriority.NORMAL, ignore_cancelled=False):

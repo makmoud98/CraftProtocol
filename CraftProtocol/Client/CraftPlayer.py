@@ -10,14 +10,14 @@ import traceback
 from cStringIO import StringIO
 
 import Event
-from ..ChatMode import ChatMode
-from ..ChatSerializer import ChatSerializer
-from ..Hand import Hand
-from ..Inventory import Inventory
-from ..ClientStatus import ClientStatus
-from ..Packet import *
-from ..StreamIO import StreamIO
-from ..VersionConstants import VersionConstants
+from CraftProtocol.ChatMode import ChatMode
+from CraftProtocol.ChatSerializer import ChatSerializer
+from CraftProtocol.ClientStatus import ClientStatus
+from CraftProtocol.Hand import Hand
+from CraftProtocol.Inventory import Inventory
+from CraftProtocol.Packet import *
+from CraftProtocol.StreamIO import StreamIO
+from CraftProtocol.VersionConstants import VersionConstants
 
 
 class CraftPlayerReaderThread(threading.Thread):
@@ -62,8 +62,6 @@ class CraftPlayerWriterThread(threading.Thread):
 
     def run(self):
         while not self._stopped:
-            packet = None
-
             try:
                 packet = self._queue.get_nowait()
             except Queue.Empty:
@@ -185,7 +183,7 @@ class CraftPlayer(object):
                     Play.PlayerPositionServerPacket(packet.get_x(), packet.get_y(), packet.get_z(), True))
                 player._spawned = True
 
-            with player._lock:
+            with player.get_lock():
                 player._x = packet.get_x()
                 player._y = packet.get_y()
                 player._z = packet.get_z()
@@ -218,14 +216,14 @@ class CraftPlayer(object):
             if event.is_cancelled():
                 return
 
-            player._lock.acquire()
-            if player._open_inventory == None or packet.get_window_id() != player._open_inventory.get_id():
+            player.get_lock().acquire()
+            if player._open_inventory is None or packet.get_window_id() != player._open_inventory.get_id():
                 event.cancel()
-                player._lock.release()
+                player.get_lock().release()
                 player.disconnect("Received confirm transaction packet for not initialized window")
                 return
 
-            player._lock.release()
+            player.get_lock().release()
             player.send_packet(Play.ConfirmTransactionServerPacket(packet.get_window_id(), packet.get_action_number(),
                                                                    packet.is_accepted()))
         elif packet.__class__ == Play.OpenWindowPacket:
@@ -245,30 +243,52 @@ class CraftPlayer(object):
             player._open_inventory = open_inventory_event.get_inventory()
         elif packet.__class__ == Play.KeepAliveClientPacket:
             player.send_packet(Play.KeepAliveServerPacket(packet.get_id()))
+        elif packet.__class__ == Play.CloseWindowServerPacket:
+            if event.is_cancelled():
+                return
+
+            player.get_lock().acquire()
+
+            if packet.get_window_id() != player._open_inventory.get_id():
+                event.cancel()
+                player._try_disconnect_async("Closed not initialized window")
+                player.get_lock().release()
+                return
+
+            player.get_lock().release()
+
+            close_inventory_event = Event.CloseInventoryEvent(player, player._open_inventory)
+            player.fire(close_inventory_event)
+
+            if close_inventory_event.is_cancelled():
+                event.cancel()
+                return
+
+            player._open_inventory = None
         elif packet.__class__ == Play.WindowItemsPacket:
             if event.is_cancelled():
                 return
 
-            player._lock.acquire()
+            player.get_lock().acquire()
 
             if packet.get_window_id() == player._main_inventory.get_id():
                 update_inventory_event = Event.UpdateInventoryEvent(player, player._main_inventory, packet.get_slots())
             elif player._open_inventory is None:
                 event.cancel()
                 player._try_disconnect_async("Received items for not initialized window")
-                player._lock.release()
+                player.get_lock().release()
                 return
             else:
                 update_inventory_event = Event.UpdateInventoryEvent(player, player._open_inventory, packet.get_slots())
 
-            player._lock.release()
+            player.get_lock().release()
 
             player.fire(update_inventory_event)
             if update_inventory_event.is_cancelled():
                 event.cancel()
                 return
 
-            player._lock.acquire()
+            player.get_lock().acquire()
 
             if update_inventory_event.get_inventory() == player._main_inventory:
                 slots = update_inventory_event.get_slots()
@@ -276,7 +296,7 @@ class CraftPlayer(object):
                 if len(slots) > len(player._main_inventory):
                     event.cancel()
                     player._try_disconnect_async("Received too many items")
-                    player._lock.release()
+                    player.get_lock().release()
                     return
 
                 main_inventory = player._main_inventory.copy()
@@ -285,7 +305,7 @@ class CraftPlayer(object):
                     main_inventory[i] = slots[i]
 
                 player._main_inventory = main_inventory
-                player._lock.release()
+                player.get_lock().release()
                 return
 
             slots = update_inventory_event.get_slots()[:len(player._open_inventory) - 1]
@@ -294,7 +314,7 @@ class CraftPlayer(object):
             if len(main_slots) + 8 > len(player._main_inventory):
                 event.cancel()
                 player._try_disconnect_async("Received too many items")
-                player._lock.release()
+                player.get_lock().release()
                 return
 
             main_inventory = player._main_inventory.copy()
@@ -308,7 +328,7 @@ class CraftPlayer(object):
                 open_inventory[i] = slots[i]
             player._open_inventory = open_inventory
 
-            player._lock.release()
+            player.get_lock().release()
 
     @Event.Handler(priority=Event.HandlerPriority.LOW, ignore_cancelled=True)
     def _process_out_packet(self, event):
@@ -319,7 +339,7 @@ class CraftPlayer(object):
             if event.is_cancelled():
                 return
 
-            with player._lock:
+            with player.get_lock():
                 player._x = packet.get_x()
                 player._y = packet.get_y()
                 player._z = packet.get_z()
@@ -327,33 +347,9 @@ class CraftPlayer(object):
             if event.is_cancelled():
                 return
 
-            close_inventory_event = None
-
-            with player._lock:
+            with player.get_lock():
                 if player._open_inventory is not None and packet.get_window_id() == player._open_inventory.get_id():
-                    close_inventory_event = Event.CloseInventoryEvent(player, player._open_inventory)
-
-            if close_inventory_event is None:
-                return
-
-            player.fire(close_inventory_event)
-            if close_inventory_event.is_cancelled():
-                event.cancel()
-                return
-
-            player._open_inventory = None
-        elif packet.__class__ == Play.ChatMessageServerPacket:
-            if event.is_cancelled():
-                return
-
-            chat_send_event = Event.ChatSendEvent(player, packet.get_text())
-            player.fire(chat_send_event)
-
-            if chat_send_event.is_cancelled():
-                event.cancel()
-                return
-
-            event.set_packet(Play.ChatMessageServerPacket(chat_send_event.get_text()))
+                    player._open_inventory = None
 
     def get_username(self):
         return self._username
@@ -363,6 +359,9 @@ class CraftPlayer(object):
 
     def get_protocol(self):
         return self._server.get_protocol()
+
+    def get_lock(self):
+        return self._lock
 
     def is_connected(self):
         return self._sock is not None
@@ -387,25 +386,31 @@ class CraftPlayer(object):
         self._serializer = None
 
     def disconnect(self, reason=""):
-        with self._lock:
+        with self.get_lock():
             if not self.is_connected():
                 raise IOError("Not connected")
 
             self._try_disconnect_async(reason)
 
     def try_disconnect(self, reason=""):
-        with self._lock:
+        with self.get_lock():
             self._try_disconnect_async(reason)
 
     def send_packet(self, packet):
-        with self._lock:
+        with self.get_lock():
             if not self.is_connected():
                 raise IOError("Not connected")
 
             self._writer.send_packet(packet)
 
     def chat(self, message):
-        self.send_packet(Play.ChatMessageServerPacket(message))
+        chat_send_event = Event.ChatSendEvent(self, message)
+        self.fire(chat_send_event)
+
+        if chat_send_event.is_cancelled():
+            return
+
+        self.send_packet(Play.ChatMessageServerPacket(chat_send_event.get_text()))
 
     def use_hand(self, hand):
         self.send_packet(Play.UseItemPacket(hand))
@@ -422,32 +427,39 @@ class CraftPlayer(object):
                                    inventory[slot]))
 
     def get_open_inventory(self):
-        with self._lock:
-            return self.open_inventory
+        with self.get_lock():
+            return self._open_inventory
 
     def get_main_inventory(self):
-        with self._lock:
-            return self.main_inventory
+        with self.get_lock():
+            return self._main_inventory
 
     def close_inventory(self):
-        with self._lock:
-            if self._open_inventory is not None:
-                self.send_packet(Play.CloseWindowServerPacket(self._open_inventory.get_id()))
+        if self._open_inventory is None:
+            raise ValueError("No inventory to close")
+
+        close_inventory_event = Event.CloseInventoryEvent(self, self._open_inventory)
+        self.fire(close_inventory_event)
+
+        if close_inventory_event.is_cancelled():
+            return
+
+        self.send_packet(Play.CloseWindowServerPacket(close_inventory_event.get_inventory().get_id()))
 
     def get_x(self):
-        with self._lock:
+        with self.get_lock():
             return self._x
 
     def get_y(self):
-        with self._lock:
+        with self.get_lock():
             return self._y
 
     def get_z(self):
-        with self._lock:
+        with self.get_lock():
             return self._z
 
     def get_entity_id(self):
-        with self._lock:
+        with self.get_lock():
             return self._entity_id
 
     def respawn(self):
@@ -457,14 +469,14 @@ class CraftPlayer(object):
         self._event_bus.fire(event)
 
     def is_spawned(self):
-        with self._lock:
+        with self.get_lock():
             return self._spawned
 
     def register_listener(self, event_class, handler):
         self._event_bus.register_listener(event_class, handler)
 
     def reconnect(self):
-        with self._lock:
+        with self.get_lock():
             self._try_disconnect_async("Reconnecting...")
 
             new = self._server.login(self._username)
@@ -472,7 +484,7 @@ class CraftPlayer(object):
             self.__dict__.update(new.__dict__)
 
     def loop(self):
-        with self._lock:
+        with self.get_lock():
             if not self.is_connected():
                 raise IOError("Not connected")
 

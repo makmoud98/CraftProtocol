@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from ..BasePacket import BasePacket
-from ..PacketDirection import PacketDirection
-from ...ItemStack import ItemStack
-from ...NBT import NBTSerializer
-from ...StreamIO import StreamIO
+from CraftProtocol.Packet.BasePacket import BasePacket
+from CraftProtocol.Packet.PacketDirection import PacketDirection
+from CraftProtocol.ItemStack import ItemStack
+from CraftProtocol.NBT.NBTSerializer import NBTSerializer
+from CraftProtocol.StreamIO import StreamIO
 
 
 class ClickWindowPacket(BasePacket):

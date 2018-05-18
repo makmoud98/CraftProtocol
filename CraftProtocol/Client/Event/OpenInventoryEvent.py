@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from BaseEvent import BaseEvent
+from CraftProtocol.Client.Event import BaseEvent
 
 
 class OpenInventoryEvent(BaseEvent):

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from PacketDirection import PacketDirection
-from ..ProtocolState import ProtocolState
+from CraftProtocol.Packet.PacketDirection import PacketDirection
+from CraftProtocol.Packet.BasePacket import BasePacket
+from CraftProtocol.ProtocolState import ProtocolState
 
 
 class PacketManager(object):
@@ -21,12 +22,15 @@ class PacketManager(object):
     }
 
     @staticmethod
-    def get(state, direction, id):
-        return PacketManager._PACKETS[state][direction][id]
+    def get(state, direction, packet_id):
+        return PacketManager._PACKETS[state][direction][packet_id]
 
     @staticmethod
-    def register(state, direction, id, cls):
+    def register(state, direction, packet_id, cls):
+        if not issubclass(cls, BasePacket):
+            raise ValueError("This class is not valid packet")
+
         if id in PacketManager._PACKETS[state][direction]:
             raise ValueError("This id is already registered")
 
-        PacketManager._PACKETS[state][direction][id] = cls
+        PacketManager._PACKETS[state][direction][packet_id] = cls

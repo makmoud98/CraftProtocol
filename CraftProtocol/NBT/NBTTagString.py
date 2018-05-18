@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from NBTBase import NBTBase
-from ..StreamIO import StreamIO
+from CraftProtocol.NBT.NBTBase import NBTBase
+from CraftProtocol.StreamIO import StreamIO
 
 
 class NBTTagString(NBTBase):

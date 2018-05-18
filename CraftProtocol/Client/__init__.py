@@ -2,6 +2,6 @@
 
 import Event
 from PingError import PingError
+from KickError import KickError
 from CraftPlayer import CraftPlayer
 from CraftServer import CraftServer
-from KickError import KickError

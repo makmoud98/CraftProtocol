@@ -10,7 +10,7 @@ from BasePacket import BasePacket
 from PacketDirection import PacketDirection
 from PacketManager import PacketManager
 from PacketSerializer import PacketSerializer
-from ..ProtocolState import ProtocolState
+from CraftProtocol.ProtocolState import ProtocolState
 
 for name, cls in Handshaking.__dict__.items():
     if isinstance(cls, types.TypeType) and issubclass(cls, BasePacket):

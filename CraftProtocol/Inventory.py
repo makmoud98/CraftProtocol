@@ -2,15 +2,15 @@
 
 import threading
 
-from ItemStack import ItemStack
+from CraftProtocol.ItemStack import ItemStack
 
 
 class Inventory(object):
 
-    def __init__(self, id, title, type, slots_number, entity_id=None):
-        self._id = id
+    def __init__(self, inventory_id, title, inventory_type, slots_number, entity_id=None):
+        self._id = inventory_id
         self._title = title
-        self._type = type
+        self._type = inventory_type
         self._slots = [ItemStack.empty()] * slots_number
         self._entity_id = entity_id
         self._action_number = 1

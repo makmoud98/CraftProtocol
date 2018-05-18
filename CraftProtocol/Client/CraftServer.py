@@ -3,12 +3,12 @@
 import json
 import socket
 
-from CraftPlayer import CraftPlayer
-from KickError import KickError
-from PingError import PingError
-from ..ChatSerializer import ChatSerializer
-from ..Packet import *
-from ..ProtocolState import ProtocolState
+from CraftProtocol.Client.CraftPlayer import CraftPlayer
+from CraftProtocol.Client.KickError import KickError
+from CraftProtocol.Client.PingError import PingError
+from CraftProtocol.ChatSerializer import ChatSerializer
+from CraftProtocol.Packet import *
+from CraftProtocol.ProtocolState import ProtocolState
 
 
 class CraftServer(object):

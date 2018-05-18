@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
-from RequestPacket import RequestPacket
-from ResponsePacket import ResponsePacket
+from CraftProtocol.Packet.Status.RequestPacket import RequestPacket
+from CraftProtocol.Packet.Status.ResponsePacket import ResponsePacket

@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 
-from NBTBase import NBTBase
-from NBTManager import NBTManager
-from ..StreamIO import StreamIO
+from CraftProtocol.NBT.NBTBase import NBTBase
+from CraftProtocol.NBT.NBTManager import NBTManager
+from CraftProtocol.StreamIO import StreamIO
 
 
 class NBTTagList(NBTBase):
     TYPE_ID = 0x09
 
-    def __init__(self, type, values=[]):
+    def __init__(self, type_tag, values=[]):
         NBTBase.__init__(self)
-        self._type = type
+        self._type_tag = type_tag
         self._values = values
 
     def get(self):
         return self._values
 
-    def get_type(self):
-        return self._type
+    def get_type_tag(self):
+        return self._type_tag
 
     def __getitem__(self, index):
         return self._values[index]
@@ -38,8 +38,8 @@ class NBTTagList(NBTBase):
         return len(self._values)
 
     def append(self, x):
-        if x.__class__ != self._type:
-            raise ValueError("arg must be " + self._type.__name__)
+        if x.__class__ != self._type_tag:
+            raise ValueError("arg must be " + self._type_tag.__name__)
 
         self._values.append(x)
 
@@ -48,21 +48,21 @@ class NBTTagList(NBTBase):
 
     @staticmethod
     def write(stream, tag):
-        StreamIO.write_ubyte(stream, tag._type.TYPE_ID)
+        StreamIO.write_ubyte(stream, tag._type_tag.TYPE_ID)
         StreamIO.write_int(stream, len(tag._values))
 
         for i in tag._values:
-            tag._type.write(stream, i)
+            tag._type_tag.write(stream, i)
 
     @staticmethod
     def read(stream):
         type_id = StreamIO.read_ubyte(stream)
         values = []
 
-        type = NBTManager.get(type_id)
+        tag_type = NBTManager.get(type_id)
 
         values_len = StreamIO.read_int(stream)
         for i in range(values_len):
-            values.append(type.read(stream))
+            values.append(tag_type.read(stream))
 
-        return NBTTagList(type, values)
+        return NBTTagList(tag_type, values)

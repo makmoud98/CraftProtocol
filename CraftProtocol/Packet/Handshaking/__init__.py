@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-from HandshakePacket import HandshakePacket
+from CraftProtocol.Packet.Handshaking.HandshakePacket import HandshakePacket

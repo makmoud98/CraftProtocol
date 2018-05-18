@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from ..BasePacket import BasePacket
-from ..PacketDirection import PacketDirection
+from CraftProtocol.Packet.BasePacket import BasePacket
+from CraftProtocol.Packet.PacketDirection import PacketDirection
 
 
 class RequestPacket(BasePacket):

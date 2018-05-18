@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from ..BasePacket import BasePacket
-from ..PacketDirection import PacketDirection
-from ...StreamIO import StreamIO
+from CraftProtocol.Packet.BasePacket import BasePacket
+from CraftProtocol.Packet.PacketDirection import PacketDirection
+from CraftProtocol.StreamIO import StreamIO
 
 
 class ResponsePacket(BasePacket):
